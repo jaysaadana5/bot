@@ -1,0 +1,44 @@
+# AI Code Detection Bot Configuration
+# ------------------------------------
+
+# Confidence thresholds for verdicts
+thresholds:
+  likely_ai: 0.7        # >= this = "Likely AI-generated"
+  possibly_ai: 0.4      # >= this = "Possibly AI-generated"
+                         # below possibly_ai = "Likely human-written"
+
+# Minimum lines added in a file to trigger analysis
+min_lines_to_analyze: 3
+
+# File extensions to analyze (add/remove as needed)
+supported_extensions:
+  - .py
+  - .js
+  - .ts
+  - .tsx
+  - .jsx
+  - .java
+  - .go
+  - .rs
+  - .rb
+  - .php
+  - .c
+  - .cpp
+  - .h
+  - .hpp
+  - .cs
+  - .swift
+  - .kt
+  - .scala
+  - .sh
+  - .bash
+
+# Files/paths to exclude from analysis
+exclude_patterns:
+  - "vendor/*"
+  - "node_modules/*"
+  - "*.min.js"
+  - "*.generated.*"
+  - "package-lock.json"
+  - "yarn.lock"
+  - "go.sum"

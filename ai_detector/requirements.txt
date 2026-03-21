@@ -1,0 +1,2 @@
+# AI Code Detection Bot - no external dependencies required
+# Uses only Python standard library (re, json, sys, dataclasses, pathlib)
