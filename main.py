@@ -1,3 +1,4 @@
+import logging
 import time
 from datetime import datetime
 
@@ -12,24 +13,30 @@ from memory import is_bad_condition, store_bad_pattern
 from logger import log_trade
 from claude_ai import ask_claude
 
+log = logging.getLogger(__name__)
+
 risk = RiskManager()
 tuner = AutoTuneManager()
 trade_history = []
 
 
-def run():
+def run() -> None:
+    """Run the adaptive BTC trading bot loop."""
     cycle = 0
 
     while True:
         cycle += 1
         tuner.next_cycle()
 
-        print(f"\n[Cycle {cycle}] {datetime.utcnow().strftime('%H:%M:%S UTC')} | threshold={config.THRESHOLD}")
+        log.info(
+            "[Cycle %d] %s | threshold=%s",
+            cycle, datetime.utcnow().strftime('%H:%M:%S UTC'), config.THRESHOLD,
+        )
 
         try:
             p0 = get_btc_price()
         except Exception as e:
-            print(f"Price fetch error: {e}")
+            log.error("Price fetch error: %s", e)
             time.sleep(10)
             continue
 
@@ -38,7 +45,7 @@ def run():
         try:
             p1 = get_btc_price()
         except Exception as e:
-            print(f"Price fetch error: {e}")
+            log.error("Price fetch error: %s", e)
             time.sleep(10)
             continue
 
@@ -46,14 +53,17 @@ def run():
         volatility = abs(momentum)
 
         decision, regime = decide_trade(p0, p1, momentum, volatility, config.THRESHOLD)
-        print(f"  p0={p0:.2f} p1={p1:.2f} momentum={momentum:+.2f} volatility={volatility:.2f} regime={regime} decision={decision}")
+        log.info(
+            "  p0=%.2f p1=%.2f momentum=%+.2f volatility=%.2f regime=%s decision=%s",
+            p0, p1, momentum, volatility, regime, decision,
+        )
 
         if decision == "SKIP":
-            print("  Skipping — regime filter.")
+            log.info("  Skipping — regime filter.")
             continue
 
         if is_bad_condition(momentum, volatility):
-            print("  Skipping — known bad condition.")
+            log.info("  Skipping — known bad condition.")
             continue
 
         mode = "PAPER" if risk.in_cooldown() else "REAL"
@@ -72,7 +82,7 @@ def run():
                 profit = 8
             else:
                 profit = -config.STOP_LOSS
-            print(f"  [REAL] profit={profit:+}")
+            log.info("  [REAL] profit=%+d", profit)
         else:
             try:
                 exit_price = get_btc_price()
@@ -105,7 +115,7 @@ def run():
             increase = profit >= 0
             adjust_threshold(config, increase=not increase)
             tuner.mark_tuned()
-            print(f"  [AutoTune] threshold adjusted to {config.THRESHOLD}")
+            log.info("  [AutoTune] threshold adjusted to %s", config.THRESHOLD)
 
         # Ask Claude for commentary every 10 cycles
         if cycle % 10 == 0:
@@ -116,15 +126,19 @@ def run():
                     f"Recent trades: {len(trade_history)}. "
                     "Give a one-sentence market assessment."
                 )
-                print(f"  [Claude] {summary}")
+                log.info("  [Claude] %s", summary)
             except Exception as e:
-                print(f"  [Claude] unavailable: {e}")
+                log.warning("  [Claude] unavailable: %s", e)
 
         # Small pause between cycles to avoid hammering the API
         time.sleep(5)
 
 
 if __name__ == "__main__":
-    print("BTC Adaptive Trading Bot starting...")
-    print(f"Mode: REAL → PAPER on cooldown | threshold={config.THRESHOLD} | stop_loss={config.STOP_LOSS}")
+    logging.basicConfig(level=logging.INFO, format="%(message)s")
+    log.info("BTC Adaptive Trading Bot starting...")
+    log.info(
+        "Mode: REAL → PAPER on cooldown | threshold=%s | stop_loss=%s",
+        config.THRESHOLD, config.STOP_LOSS,
+    )
     run()

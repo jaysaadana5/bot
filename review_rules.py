@@ -171,7 +171,10 @@ def check_mutable_default_args(source: str, filename: str) -> List[Issue]:
                         "severity": "MEDIUM",
                         "category": "bug",
                         "rule": "mutable-default-arg",
-                        "message": f"Mutable default argument in '{node.name}()'. Use None and create inside the function.",
+                        "message": (
+                            f"Mutable default argument in '{node.name}()'."
+                            " Use None and create inside the function."
+                        ),
                     })
     return issues
 

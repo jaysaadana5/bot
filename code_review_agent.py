@@ -95,7 +95,7 @@ class CodeReviewAgent:
         model: str = "claude-sonnet-4-20250514",
         use_ai: bool = True,
         severity_threshold: str = "INFO",
-    ):
+    ) -> None:
         self.model = model
         self.use_ai = use_ai and _anthropic_available
         self.severity_threshold = severity_threshold
@@ -134,7 +134,6 @@ class CodeReviewAgent:
         file_reports: List[Dict[str, Any]] = []
 
         for fpath in files:
-            rel = str(fpath.relative_to(root))
             report = self.review_file(str(fpath))
             file_reports.append(report)
             all_issues.extend(report.get("issues", []))

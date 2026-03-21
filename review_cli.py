@@ -24,38 +24,41 @@ import sys
 from code_review_agent import CodeReviewAgent, format_report
 
 
-def main():
-    parser = argparse.ArgumentParser(
-        description="AI Code Review Agent — >98% accuracy code reviews"
-    )
-    subparsers = parser.add_subparsers(dest="command", help="Review mode")
-
-    # --- file ---
-    p_file = subparsers.add_parser("file", help="Review a single file")
-    p_file.add_argument("path", help="Path to the Python file")
-
-    # --- dir ---
-    p_dir = subparsers.add_parser("dir", help="Review a directory")
-    p_dir.add_argument("path", help="Path to the directory")
-    p_dir.add_argument("--pattern", default="**/*.py", help="Glob pattern (default: **/*.py)")
-
-    # --- diff ---
-    p_diff = subparsers.add_parser("diff", help="Review a diff")
-    p_diff.add_argument("--git", action="store_true", help="Run git diff automatically")
-
-    # --- self ---
-    subparsers.add_parser("self", help="Review this project's own code")
-
-    # Global flags
-    parser.add_argument("--no-ai", action="store_true", help="Static analysis only")
-    parser.add_argument(
+def main() -> None:
+    """CLI entry point for the AI Code Review Agent."""
+    # Shared flags available on every subcommand
+    shared = argparse.ArgumentParser(add_help=False)
+    shared.add_argument("--no-ai", action="store_true", help="Static analysis only")
+    shared.add_argument(
         "--severity",
         default="INFO",
         choices=["CRITICAL", "HIGH", "MEDIUM", "LOW", "INFO"],
         help="Minimum severity to report",
     )
-    parser.add_argument("--json", action="store_true", dest="json_output", help="Raw JSON output")
-    parser.add_argument("--no-color", action="store_true", help="Disable colors")
+    shared.add_argument("--json", action="store_true", dest="json_output", help="Raw JSON output")
+    shared.add_argument("--no-color", action="store_true", help="Disable colors")
+
+    parser = argparse.ArgumentParser(
+        description="AI Code Review Agent — >98% accuracy code reviews",
+        parents=[shared],
+    )
+    subparsers = parser.add_subparsers(dest="command", help="Review mode")
+
+    # --- file ---
+    p_file = subparsers.add_parser("file", help="Review a single file", parents=[shared])
+    p_file.add_argument("path", help="Path to the Python file")
+
+    # --- dir ---
+    p_dir = subparsers.add_parser("dir", help="Review a directory", parents=[shared])
+    p_dir.add_argument("path", help="Path to the directory")
+    p_dir.add_argument("--pattern", default="**/*.py", help="Glob pattern (default: **/*.py)")
+
+    # --- diff ---
+    p_diff = subparsers.add_parser("diff", help="Review a diff", parents=[shared])
+    p_diff.add_argument("--git", action="store_true", help="Run git diff automatically")
+
+    # --- self ---
+    subparsers.add_parser("self", help="Review this project's own code", parents=[shared])
 
     args = parser.parse_args()
 
