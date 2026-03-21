@@ -1,8 +1,14 @@
-import requests
+from tradingview_ta import TA_Handler, Interval
+
+
+_handler = TA_Handler(
+    symbol="BTCUSDT",
+    screener="crypto",
+    exchange="BINANCE",
+    interval=Interval.INTERVAL_1_MINUTE,
+)
 
 
 def get_btc_price():
-    url = "https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT"
-    response = requests.get(url, timeout=10)
-    response.raise_for_status()
-    return float(response.json()["price"])
+    analysis = _handler.get_analysis()
+    return float(analysis.indicators["close"])
