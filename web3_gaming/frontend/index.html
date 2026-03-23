@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>.OG Gaming - Web3 Gaming Platform</title>
+    <style>
+        :root {
+            --primary: #8b5cf6;
+            --primary-dark: #7c3aed;
+            --accent: #06ffa5;
+            --bg: #0a0a1a;
+            --bg-card: #111128;
+            --bg-card-hover: #1a1a3e;
+            --text: #e2e8f0;
+            --text-dim: #94a3b8;
+            --border: #2d2d5e;
+            --danger: #ef4444;
+            --success: #22c55e;
+            --gold: #f59e0b;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        /* Navbar */
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            background: rgba(17, 17, 40, 0.95);
+            border-bottom: 1px solid var(--border);
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .logo span { font-weight: 400; opacity: 0.8; }
+
+        .nav-links { display: flex; gap: 1.5rem; align-items: center; }
+
+        .nav-links a {
+            color: var(--text-dim);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.2s;
+            cursor: pointer;
+        }
+
+        .nav-links a:hover, .nav-links a.active { color: var(--accent); }
+
+        .btn {
+            padding: 0.6rem 1.2rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+        }
+
+        .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4); }
+
+        .btn-accent {
+            background: linear-gradient(135deg, var(--accent), #00cc84);
+            color: #000;
+        }
+
+        .btn-accent:hover { transform: translateY(-1px); box-shadow: 0 4px 15px rgba(6, 255, 165, 0.3); }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text);
+        }
+
+        .btn-outline:hover { border-color: var(--primary); }
+
+        /* Hero */
+        .hero {
+            text-align: center;
+            padding: 5rem 2rem 3rem;
+            background: radial-gradient(ellipse at center top, rgba(139, 92, 246, 0.15), transparent 70%);
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            line-height: 1.1;
+        }
+
+        .hero h1 .og { color: var(--accent); }
+
+        .hero p { color: var(--text-dim); font-size: 1.2rem; max-width: 600px; margin: 0 auto 2rem; }
+
+        .hero-actions { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+
+        /* Sections */
+        .section { padding: 4rem 2rem; max-width: 1200px; margin: 0 auto; }
+
+        .section-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .section-subtitle {
+            color: var(--text-dim);
+            margin-bottom: 2rem;
+        }
+
+        /* Domain Search */
+        .domain-search {
+            max-width: 600px;
+            margin: 0 auto 3rem;
+            position: relative;
+        }
+
+        .domain-search input {
+            width: 100%;
+            padding: 1rem 1.5rem;
+            padding-right: 120px;
+            background: var(--bg-card);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            color: var(--text);
+            font-size: 1.1rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .domain-search input:focus { border-color: var(--primary); }
+
+        .domain-search .suffix {
+            position: absolute;
+            right: 100px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--accent);
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .domain-search button {
+            position: absolute;
+            right: 6px;
+            top: 6px;
+            bottom: 6px;
+            padding: 0 1.2rem;
+            border-radius: 8px;
+        }
+
+        #domain-result {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 8px;
+            display: none;
+        }
+
+        #domain-result.available {
+            display: block;
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid var(--success);
+            color: var(--success);
+        }
+
+        #domain-result.taken {
+            display: block;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid var(--danger);
+            color: var(--danger);
+        }
+
+        /* Cards grid */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.2s;
+        }
+
+        .card:hover {
+            background: var(--bg-card-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .card-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .card h3 { font-size: 1.1rem; margin-bottom: 0.5rem; }
+        .card p { color: var(--text-dim); font-size: 0.9rem; line-height: 1.5; }
+
+        /* Profile Section */
+        .profile-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .profile-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; }
+
+        .profile-avatar {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .profile-name { font-size: 1.3rem; font-weight: 700; }
+        .profile-domain { color: var(--accent); font-size: 0.9rem; }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat {
+            text-align: center;
+            padding: 1rem;
+            background: rgba(139, 92, 246, 0.1);
+            border-radius: 10px;
+        }
+
+        .stat-value { font-size: 1.5rem; font-weight: 700; color: var(--accent); }
+        .stat-label { font-size: 0.75rem; color: var(--text-dim); margin-top: 0.25rem; }
+
+        /* Games List */
+        .game-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            margin-bottom: 0.75rem;
+            transition: all 0.2s;
+        }
+
+        .game-item:hover { border-color: var(--primary); background: var(--bg-card-hover); }
+
+        .game-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .game-info { flex: 1; }
+        .game-info h4 { font-size: 1rem; margin-bottom: 0.2rem; }
+        .game-info p { font-size: 0.8rem; color: var(--text-dim); }
+        .game-players { color: var(--accent); font-size: 0.85rem; font-weight: 600; }
+
+        /* Inventory */
+        .inventory-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 1rem;
+        }
+
+        .item-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 1rem;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .item-card:hover { border-color: var(--gold); transform: scale(1.02); }
+
+        .item-icon { font-size: 2.5rem; margin-bottom: 0.5rem; }
+        .item-name { font-weight: 600; font-size: 0.9rem; }
+
+        .rarity-common { border-left: 3px solid #9ca3af; }
+        .rarity-uncommon { border-left: 3px solid #22c55e; }
+        .rarity-rare { border-left: 3px solid #3b82f6; }
+        .rarity-epic { border-left: 3px solid #a855f7; }
+        .rarity-legendary { border-left: 3px solid #f59e0b; }
+
+        .rarity-tag {
+            font-size: 0.7rem;
+            padding: 0.15rem 0.5rem;
+            border-radius: 4px;
+            display: inline-block;
+            margin-top: 0.3rem;
+        }
+
+        /* Token Section */
+        .token-panel {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .token-balance {
+            text-align: center;
+            padding: 1.5rem;
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(6, 255, 165, 0.1));
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+        }
+
+        .token-amount { font-size: 2.5rem; font-weight: 800; }
+        .token-symbol { color: var(--accent); }
+
+        .token-actions { display: flex; gap: 0.75rem; }
+        .token-actions .btn { flex: 1; }
+
+        /* Tabs */
+        .tabs { display: flex; gap: 0; margin-bottom: 2rem; border-bottom: 1px solid var(--border); }
+
+        .tab {
+            padding: 0.75rem 1.5rem;
+            background: none;
+            border: none;
+            color: var(--text-dim);
+            font-size: 0.9rem;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+        .tab:hover { color: var(--text); }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        /* Connect Wallet Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 200;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-overlay.active { display: flex; }
+
+        .modal {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .modal h2 { margin-bottom: 1rem; }
+
+        .wallet-option {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            margin-bottom: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .wallet-option:hover { border-color: var(--primary); background: rgba(139, 92, 246, 0.1); }
+        .wallet-option span { font-size: 1.5rem; }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 2rem;
+            border-top: 1px solid var(--border);
+            color: var(--text-dim);
+            font-size: 0.85rem;
+        }
+
+        /* Page sections hidden by default */
+        .page { display: none; }
+        .page.active { display: block; }
+
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2rem; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .card-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <div class="logo">.OG <span>Gaming</span></div>
+    <div class="nav-links">
+        <a onclick="showPage('home')" class="active" id="nav-home">Home</a>
+        <a onclick="showPage('domains')" id="nav-domains">Domains</a>
+        <a onclick="showPage('games')" id="nav-games">Games</a>
+        <a onclick="showPage('inventory')" id="nav-inventory">Inventory</a>
+        <a onclick="showPage('profile')" id="nav-profile">Profile</a>
+        <button class="btn btn-primary" id="connect-btn" onclick="openConnectModal()">Connect Wallet</button>
+    </div>
+</nav>
+
+<!-- Home Page -->
+<div id="page-home" class="page active">
+    <section class="hero">
+        <h1>Your Gaming Identity<br>Lives on <span class="og">.OG</span></h1>
+        <p>Register your .og domain, build your gamer profile, collect NFT assets, and earn tokens across the Web3 gaming ecosystem.</p>
+        <div class="hero-actions">
+            <button class="btn btn-accent" onclick="showPage('domains')">Claim Your .OG Domain</button>
+            <button class="btn btn-outline" onclick="showPage('games')">Explore Games</button>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="card-grid">
+            <div class="card">
+                <div class="card-icon" style="background: rgba(139, 92, 246, 0.2);">&#127918;</div>
+                <h3>.OG Gaming Identity</h3>
+                <p>Your .og domain is your universal gaming identity. One name across all Web3 games, with your stats, achievements, and reputation on-chain.</p>
+            </div>
+            <div class="card">
+                <div class="card-icon" style="background: rgba(6, 255, 165, 0.2);">&#9876;&#65039;</div>
+                <h3>Cross-Game Assets</h3>
+                <p>Own your in-game items as NFTs. Weapons, skins, and achievements travel with you across compatible games in the .og ecosystem.</p>
+            </div>
+            <div class="card">
+                <div class="card-icon" style="background: rgba(245, 158, 11, 0.2);">&#129689;</div>
+                <h3>OGT Token Economy</h3>
+                <p>Earn OGT tokens by playing games, stake for rewards, and use them across the ecosystem for purchases, upgrades, and governance.</p>
+            </div>
+            <div class="card">
+                <div class="card-icon" style="background: rgba(59, 130, 246, 0.2);">&#127942;</div>
+                <h3>On-Chain Achievements</h3>
+                <p>Your gaming achievements are recorded as soul-bound tokens. Build a verifiable gaming reputation that no one can fake.</p>
+            </div>
+            <div class="card">
+                <div class="card-icon" style="background: rgba(236, 72, 153, 0.2);">&#128101;</div>
+                <h3>Guild System</h3>
+                <p>Form guilds with other .og domain holders. Compete in tournaments, share resources, and earn collective rewards.</p>
+            </div>
+            <div class="card">
+                <div class="card-icon" style="background: rgba(34, 197, 94, 0.2);">&#128640;</div>
+                <h3>Developer SDK</h3>
+                <p>Build games on the .og platform with our Python SDK. Integrate domain resolution, asset minting, and token rewards in minutes.</p>
+            </div>
+        </div>
+    </section>
+</div>
+
+<!-- Domains Page -->
+<div id="page-domains" class="page">
+    <section class="section">
+        <h2 class="section-title">Register Your .OG Domain</h2>
+        <p class="section-subtitle">Claim your unique gaming identity on the blockchain</p>
+
+        <div class="domain-search">
+            <input type="text" id="domain-input" placeholder="Search for your name..." oninput="checkDomain()">
+            <span class="suffix">.og</span>
+            <button class="btn btn-accent" onclick="registerDomain()">Register</button>
+        </div>
+        <div id="domain-result"></div>
+
+        <h3 style="margin-bottom: 1rem;">Pricing</h3>
+        <div class="card-grid">
+            <div class="card">
+                <h3>3-4 Characters</h3>
+                <p style="font-size: 1.5rem; color: var(--accent); font-weight: 700;">0.05 ETH<span style="font-size: 0.8rem; color: var(--text-dim);">/year</span></p>
+                <p>Premium short names for top gamers</p>
+            </div>
+            <div class="card">
+                <h3>5-7 Characters</h3>
+                <p style="font-size: 1.5rem; color: var(--accent); font-weight: 700;">0.01 ETH<span style="font-size: 0.8rem; color: var(--text-dim);">/year</span></p>
+                <p>Standard gaming identities</p>
+            </div>
+            <div class="card">
+                <h3>8+ Characters</h3>
+                <p style="font-size: 1.5rem; color: var(--accent); font-weight: 700;">0.005 ETH<span style="font-size: 0.8rem; color: var(--text-dim);">/year</span></p>
+                <p>Longer names, lower price</p>
+            </div>
+        </div>
+
+        <div style="margin-top: 2rem;">
+            <h3 style="margin-bottom: 1rem;">Your Domains</h3>
+            <div id="my-domains">
+                <p style="color: var(--text-dim);">Connect your wallet to view your .og domains</p>
+            </div>
+        </div>
+    </section>
+</div>
+
+<!-- Games Page -->
+<div id="page-games" class="page">
+    <section class="section">
+        <h2 class="section-title">Games</h2>
+        <p class="section-subtitle">Play, earn, and collect across the .og gaming ecosystem</p>
+
+        <div class="tabs">
+            <button class="tab active" onclick="switchGameTab('featured')">Featured</button>
+            <button class="tab" onclick="switchGameTab('all')">All Games</button>
+            <button class="tab" onclick="switchGameTab('upcoming')">Upcoming</button>
+        </div>
+
+        <div id="games-featured" class="tab-content active">
+            <div class="game-item">
+                <div class="game-icon" style="background: linear-gradient(135deg, #ef4444, #b91c1c);">&#9876;&#65039;</div>
+                <div class="game-info">
+                    <h4>OG Battle Arena</h4>
+                    <p>PvP battle royale with .og identity integration. Win matches to earn rare NFT weapons and OGT rewards.</p>
+                </div>
+                <span class="game-players">12.4k playing</span>
+            </div>
+            <div class="game-item">
+                <div class="game-icon" style="background: linear-gradient(135deg, #3b82f6, #1d4ed8);">&#127757;</div>
+                <div class="game-info">
+                    <h4>OG World Builder</h4>
+                    <p>Build and trade virtual land parcels. Your .og domain is your plot address in the metaverse.</p>
+                </div>
+                <span class="game-players">8.2k playing</span>
+            </div>
+            <div class="game-item">
+                <div class="game-icon" style="background: linear-gradient(135deg, #f59e0b, #d97706);">&#127922;</div>
+                <div class="game-info">
+                    <h4>OG Racing League</h4>
+                    <p>High-speed racing with NFT vehicles. Customize your ride and race for OGT prizes.</p>
+                </div>
+                <span class="game-players">5.7k playing</span>
+            </div>
+            <div class="game-item">
+                <div class="game-icon" style="background: linear-gradient(135deg, #8b5cf6, #6d28d9);">&#128051;</div>
+                <div class="game-info">
+                    <h4>OG Pet Champions</h4>
+                    <p>Collect, breed, and battle digital creatures. Each pet is a unique NFT tied to your .og profile.</p>
+                </div>
+                <span class="game-players">3.1k playing</span>
+            </div>
+        </div>
+
+        <div id="games-all" class="tab-content">
+            <p style="color: var(--text-dim); padding: 2rem; text-align: center;">All games catalog loading...</p>
+        </div>
+        <div id="games-upcoming" class="tab-content">
+            <p style="color: var(--text-dim); padding: 2rem; text-align: center;">Upcoming games will be announced soon.</p>
+        </div>
+    </section>
+</div>
+
+<!-- Inventory Page -->
+<div id="page-inventory" class="page">
+    <section class="section">
+        <h2 class="section-title">Your Inventory</h2>
+        <p class="section-subtitle">Game assets, achievements, and collectibles</p>
+
+        <div class="inventory-grid" id="inventory-grid">
+            <div class="item-card rarity-legendary">
+                <div class="item-icon">&#9876;&#65039;</div>
+                <div class="item-name">Void Slayer</div>
+                <span class="rarity-tag" style="background: rgba(245, 158, 11, 0.2); color: var(--gold);">Legendary</span>
+                <p style="font-size: 0.75rem; color: var(--text-dim); margin-top: 0.3rem;">Power: 95</p>
+            </div>
+            <div class="item-card rarity-epic">
+                <div class="item-icon">&#128737;</div>
+                <div class="item-name">Shadow Armor</div>
+                <span class="rarity-tag" style="background: rgba(168, 85, 247, 0.2); color: #a855f7;">Epic</span>
+                <p style="font-size: 0.75rem; color: var(--text-dim); margin-top: 0.3rem;">Power: 78</p>
+            </div>
+            <div class="item-card rarity-rare">
+                <div class="item-icon">&#127775;</div>
+                <div class="item-name">Speed Boost</div>
+                <span class="rarity-tag" style="background: rgba(59, 130, 246, 0.2); color: #3b82f6;">Rare</span>
+                <p style="font-size: 0.75rem; color: var(--text-dim); margin-top: 0.3rem;">Consumable</p>
+            </div>
+            <div class="item-card rarity-uncommon">
+                <div class="item-icon">&#127942;</div>
+                <div class="item-name">First Victory</div>
+                <span class="rarity-tag" style="background: rgba(34, 197, 94, 0.2); color: #22c55e;">Achievement</span>
+                <p style="font-size: 0.75rem; color: var(--text-dim); margin-top: 0.3rem;">Soul-bound</p>
+            </div>
+            <div class="item-card rarity-epic">
+                <div class="item-icon">&#128663;</div>
+                <div class="item-name">Neon Racer</div>
+                <span class="rarity-tag" style="background: rgba(168, 85, 247, 0.2); color: #a855f7;">Epic</span>
+                <p style="font-size: 0.75rem; color: var(--text-dim); margin-top: 0.3rem;">Vehicle</p>
+            </div>
+            <div class="item-card rarity-common">
+                <div class="item-icon">&#127759;</div>
+                <div class="item-name">Starter Land</div>
+                <span class="rarity-tag" style="background: rgba(156, 163, 175, 0.2); color: #9ca3af;">Common</span>
+                <p style="font-size: 0.75rem; color: var(--text-dim); margin-top: 0.3rem;">10x10 plot</p>
+            </div>
+        </div>
+    </section>
+</div>
+
+<!-- Profile Page -->
+<div id="page-profile" class="page">
+    <section class="section">
+        <h2 class="section-title">Player Profile</h2>
+        <p class="section-subtitle">Your on-chain gaming identity</p>
+
+        <div class="profile-card">
+            <div class="profile-header">
+                <div class="profile-avatar" id="profile-avatar">OG</div>
+                <div>
+                    <div class="profile-name" id="profile-name">OG Gamer</div>
+                    <div class="profile-domain" id="profile-domain">epicgamer.og</div>
+                </div>
+            </div>
+            <div class="stats-grid">
+                <div class="stat">
+                    <div class="stat-value" id="stat-level">12</div>
+                    <div class="stat-label">Level</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="stat-xp">11,450</div>
+                    <div class="stat-label">Total XP</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="stat-wins">87</div>
+                    <div class="stat-label">Wins</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="stat-games">142</div>
+                    <div class="stat-label">Games</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="stat-winrate">61%</div>
+                    <div class="stat-label">Win Rate</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="stat-assets">6</div>
+                    <div class="stat-label">Assets</div>
+                </div>
+            </div>
+
+            <h4 style="margin-bottom: 0.75rem;">OGT Token</h4>
+            <div class="token-balance">
+                <div class="token-amount">2,450 <span class="token-symbol">OGT</span></div>
+                <p style="color: var(--text-dim); font-size: 0.85rem; margin-top: 0.3rem;">500 OGT staked &middot; 12.5 OGT pending rewards</p>
+            </div>
+            <div class="token-actions">
+                <button class="btn btn-primary" onclick="stakeTokens()">Stake</button>
+                <button class="btn btn-outline" onclick="unstakeTokens()">Unstake</button>
+                <button class="btn btn-accent" onclick="claimRewards()">Claim</button>
+            </div>
+        </div>
+    </section>
+</div>
+
+<!-- Connect Wallet Modal -->
+<div class="modal-overlay" id="connect-modal">
+    <div class="modal">
+        <h2>Connect Wallet</h2>
+        <p style="color: var(--text-dim); margin-bottom: 1.5rem;">Choose a wallet to connect to .OG Gaming</p>
+        <div class="wallet-option" onclick="connectWallet('metamask')">
+            <span>&#129418;</span>
+            <div>
+                <strong>MetaMask</strong>
+                <p style="font-size: 0.8rem; color: var(--text-dim);">Browser extension wallet</p>
+            </div>
+        </div>
+        <div class="wallet-option" onclick="connectWallet('walletconnect')">
+            <span>&#128279;</span>
+            <div>
+                <strong>WalletConnect</strong>
+                <p style="font-size: 0.8rem; color: var(--text-dim);">Scan with mobile wallet</p>
+            </div>
+        </div>
+        <div class="wallet-option" onclick="connectWallet('coinbase')">
+            <span>&#128176;</span>
+            <div>
+                <strong>Coinbase Wallet</strong>
+                <p style="font-size: 0.8rem; color: var(--text-dim);">Coinbase wallet integration</p>
+            </div>
+        </div>
+        <button class="btn btn-outline" style="width: 100%; margin-top: 0.5rem;" onclick="closeConnectModal()">Cancel</button>
+    </div>
+</div>
+
+<footer>
+    <p>.OG Gaming Platform &mdash; Web3 Gaming with On-Chain Identity</p>
+</footer>
+
+<script>
+    let connected = false;
+    let userAddress = null;
+
+    function showPage(page) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+        document.getElementById('page-' + page).classList.add('active');
+        document.getElementById('nav-' + page)?.classList.add('active');
+    }
+
+    function switchGameTab(tab) {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        event.target.classList.add('active');
+        document.getElementById('games-' + tab).classList.add('active');
+    }
+
+    function checkDomain() {
+        const input = document.getElementById('domain-input').value.trim().toLowerCase();
+        const result = document.getElementById('domain-result');
+
+        if (input.length < 3) {
+            result.style.display = 'none';
+            return;
+        }
+
+        // Simulated availability check
+        const taken = ['og', 'game', 'pro', 'epic', 'admin', 'test'];
+        if (taken.includes(input)) {
+            result.className = 'taken';
+            result.textContent = `${input}.og is already taken`;
+            result.style.display = 'block';
+        } else {
+            result.className = 'available';
+            result.textContent = `${input}.og is available!`;
+            result.style.display = 'block';
+        }
+    }
+
+    async function registerDomain() {
+        const name = document.getElementById('domain-input').value.trim().toLowerCase();
+        if (name.length < 3) {
+            alert('Domain name must be at least 3 characters');
+            return;
+        }
+
+        if (!connected) {
+            openConnectModal();
+            return;
+        }
+
+        if (typeof window.ethereum !== 'undefined') {
+            try {
+                // In production, this would call the OGDomainRegistry contract
+                alert(`Registering ${name}.og ... (Connect to a supported network to complete)`);
+            } catch (err) {
+                console.error('Registration failed:', err);
+            }
+        }
+    }
+
+    function openConnectModal() {
+        document.getElementById('connect-modal').classList.add('active');
+    }
+
+    function closeConnectModal() {
+        document.getElementById('connect-modal').classList.remove('active');
+    }
+
+    async function connectWallet(type) {
+        closeConnectModal();
+
+        if (type === 'metamask' && typeof window.ethereum !== 'undefined') {
+            try {
+                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                userAddress = accounts[0];
+                connected = true;
+                updateUI();
+            } catch (err) {
+                console.error('Connection failed:', err);
+            }
+        } else {
+            // Demo mode
+            userAddress = '0x' + '1234abcd'.repeat(5);
+            connected = true;
+            updateUI();
+        }
+    }
+
+    function updateUI() {
+        const btn = document.getElementById('connect-btn');
+        if (connected) {
+            btn.textContent = userAddress.slice(0, 6) + '...' + userAddress.slice(-4);
+            btn.onclick = null;
+        }
+    }
+
+    function stakeTokens() {
+        if (!connected) { openConnectModal(); return; }
+        alert('Staking interface - connect to supported network');
+    }
+
+    function unstakeTokens() {
+        if (!connected) { openConnectModal(); return; }
+        alert('Unstaking interface - connect to supported network');
+    }
+
+    function claimRewards() {
+        if (!connected) { openConnectModal(); return; }
+        alert('Claiming rewards - connect to supported network');
+    }
+</script>
+
+</body>
+</html>

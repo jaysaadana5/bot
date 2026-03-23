@@ -1,3 +1,6 @@
 requests
 anthropic
 tradingview-ta
+web3
+eth-account
+py-solc-x
